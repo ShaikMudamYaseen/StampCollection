@@ -10,8 +10,10 @@ const verify_jwt_1 = __importDefault(require("../middlewares/verify-jwt"));
 const stamprouter = express_1.default.Router();
 stamprouter.post('/createStamp', verify_jwt_1.default, collectionController_1.default.createStamp);
 stamprouter.get("/getMyStamps", verify_jwt_1.default, collectionController_1.default.getMyStamps);
-stamprouter.get("/stampCollection", collectionController_1.default.getAllStamps);
+stamprouter.get("/stampCollection", verify_jwt_1.default, collectionController_1.default.getAllStamps);
 stamprouter.put('/updateStamp/:id', verify_jwt_1.default, collectionController_1.default.updateStamp);
 stamprouter.delete('/deleteStamp/:id', verify_jwt_1.default, collectionController_1.default.deleteStamp);
+stamprouter.get("/stampCollection/:stampId", verify_jwt_1.default, collectionController_1.default.getStampById);
+stamprouter.post('/sellstamp', verify_jwt_1.default, collectionController_1.default.sellStamp);
 exports.default = stamprouter;
 //# sourceMappingURL=collectoin-router.js.map

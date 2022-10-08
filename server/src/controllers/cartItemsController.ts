@@ -1,9 +1,25 @@
 import { Request, Response } from "express";
 import { PrismaClient } from '@prisma/client'
+import { match } from "assert";
 const prisma = new PrismaClient()
 const addToCart=async(req:Request,res:Response)=>{
     try{
         if(req.body.userId){
+            const match=await prisma.collection.findFirst({
+                where:{
+                id:req.body.stampId,
+                userId:req.body.userId
+                }
+            })
+            if(!match){
+                const sameItem=await prisma.cart_items.findFirst({
+                    where:{
+                        stampId:req.body.stampId
+                    }
+                })
+                console.log(sameItem);
+                
+                if(!sameItem){
             const itemDetails=await prisma.cart_items.create({
                 data:req.body
             })
@@ -11,6 +27,22 @@ const addToCart=async(req:Request,res:Response)=>{
                 status:"success",
                 item:itemDetails
             })
+        }
+        else{
+            res.status(400).json({
+                status:"failed",
+                message:"already in cart"
+            })
+
+        }
+        }
+            else{
+                res.status(400).json({
+                    status:"failed",
+                    message:"it is your stamp you cannot add to cart"
+                })
+            }
+
 
 
         }else{
@@ -23,7 +55,7 @@ const addToCart=async(req:Request,res:Response)=>{
     }catch(err){
         res.status(500).json({
             status:"failed",
-            err:"invalid id"
+            err:err
         })
     }
 

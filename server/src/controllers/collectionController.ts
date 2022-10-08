@@ -61,7 +61,14 @@ const getMyStamps=async(req:Request,res:Response)=>{
 }
 const getAllStamps=async(req:Request,res:Response)=>{
        try{
-         const stampCollection=await prisma.collection.findMany()
+         const stampCollection=await prisma.collection.findMany({
+            where:{
+                NOT:{
+                    userId:req.body.userId
+                },
+                sell:true
+            }
+         })
         // console.log(stampCollection);
         
         res.json({
@@ -112,7 +119,7 @@ const updateStamp=async(req:Request,res:Response)=>{
 }
 const deleteStamp=async(req:Request,res:Response)=>{
     try{
-        if(req.params.userId){
+        if(req.body.userId){
         const deleted=await prisma.collection.delete({
             where:{
                 id:req.params.id
@@ -141,11 +148,73 @@ catch(err:any){
     })
 }
 }
+const getStampById=async(req:Request,res:Response)=>{
+    try{
+    if(req.body.userId){
+        const stamp=await prisma.collection.findFirst({
+            where:{
+                id:req.params.stampId
+            }
+        })
+
+        res.status(200).json({
+            status:"Success",
+            stamp:stamp
+        })
+    }
+    else{
+        res.status(401).json({
+            status:"failed",
+            message:"unauthorized"
+        })
+    }
+}catch(err:any){
+    res.json({
+        status:"failed",
+        message:err.meta.cause
+    })
+}
+
+    
+}
+const sellStamp=async (req:Request,res:Response)=>{
+    try{
+    if(req.body.userId){
+        const stamp=await prisma.collection.update({
+            where:{id:req.body.stampId},
+            data:{
+                sell:true
+            }
+        })
+        res.status(200).json({
+            status:"Success",
+            message:"sell status is active now",
+            stamp:stamp
+        })
+
+
+    }else{
+        res.status(401).json({
+            status:"failed",
+            message:"unauthorized"
+        })
+    }
+}catch(err:any){
+    res.json({
+        status:"failed",
+        message:err.meta.cause
+    })
+}
+
+
+}
 export default {
     createStamp,
     getMyStamps,
     getAllStamps,
     updateStamp,
-    deleteStamp
+    deleteStamp,
+    getStampById,
+    sellStamp
 
 }

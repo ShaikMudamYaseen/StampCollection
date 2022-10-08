@@ -14,13 +14,41 @@ const prisma = new client_1.PrismaClient();
 const addToCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (req.body.userId) {
-            const itemDetails = yield prisma.cart_items.create({
-                data: req.body
+            const match = yield prisma.collection.findFirst({
+                where: {
+                    id: req.body.stampId,
+                    userId: req.body.userId
+                }
             });
-            res.status(201).json({
-                status: "success",
-                item: itemDetails
-            });
+            if (!match) {
+                const sameItem = yield prisma.cart_items.findFirst({
+                    where: {
+                        stampId: req.body.stampId
+                    }
+                });
+                console.log(sameItem);
+                if (!sameItem) {
+                    const itemDetails = yield prisma.cart_items.create({
+                        data: req.body
+                    });
+                    res.status(201).json({
+                        status: "success",
+                        item: itemDetails
+                    });
+                }
+                else {
+                    res.status(400).json({
+                        status: "failed",
+                        message: "already in cart"
+                    });
+                }
+            }
+            else {
+                res.status(400).json({
+                    status: "failed",
+                    message: "it is your stamp you cannot add to cart"
+                });
+            }
         }
         else {
             res.status(401).json({
@@ -32,7 +60,7 @@ const addToCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     catch (err) {
         res.status(500).json({
             status: "failed",
-            err: "invalid id"
+            err: err
         });
     }
 });

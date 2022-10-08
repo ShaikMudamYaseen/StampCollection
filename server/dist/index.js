@@ -9,6 +9,7 @@ const user_router_1 = __importDefault(require("./routers/user-router"));
 const login_route_1 = __importDefault(require("./routers/login-route"));
 const collectoin_router_1 = __importDefault(require("./routers/collectoin-router"));
 const cartItems_router_1 = __importDefault(require("./routers/cartItems-router"));
+const order_router_1 = __importDefault(require("./routers/order-router"));
 // import {config} from 'dotenv'
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
@@ -18,5 +19,6 @@ app.use("/api/v1", user_router_1.default);
 app.use("/api/v1/user", login_route_1.default);
 app.use("/api/v1/collection", collectoin_router_1.default);
 app.use("/api/v1/user/cart", cartItems_router_1.default);
+app.use("/api/v1/user/order", order_router_1.default);
 exports.default = app;
 //# sourceMappingURL=index.js.map

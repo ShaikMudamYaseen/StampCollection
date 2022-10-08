@@ -9,6 +9,7 @@ const prisma = new PrismaClient()
 
 const login=async(req:Request,res:Response)=>{
 
+    try{
     const user=await prisma.users.findFirst({
         where:{
             email:req.body.email
@@ -39,5 +40,9 @@ const login=async(req:Request,res:Response)=>{
             message:"user not found"
         })
     }
+}
+catch(err){
+    res.status(500).json(err)
+}
 }
 export default login

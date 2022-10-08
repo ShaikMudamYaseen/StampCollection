@@ -17,6 +17,7 @@ model Users {
   lastName   String
   email      String       @unique
   password   String
+  createdAt  DateTime     @default(now())
   Collection Collection[]
   Cart_items Cart_items[]
   Orders     Orders[]
@@ -27,30 +28,32 @@ model Collection {
   stampImageUrl String
   stampTitle    String
   stampDesc     String
+  price String @default("500")
   userId        String
-  quantity      Int      @default(1)
-  user          Users    @relation(fields: [userId], references: [id])
+  sell  Boolean @default(false)
+  user          Users    @relation(fields: [userId], references: [id],onDelete: Cascade,onUpdate: Cascade)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   Cart_items Cart_items[]
+  Orders     Orders[]
 }
 
 model Cart_items {
-  cartItemId   String     @id @default(uuid())
-  stampId String
-  collection   Collection @relation(fields: [stampId], references: [id])
-  userId       String
-  user         Users      @relation(fields: [userId], references: [id])
-  Orders       Orders[]
+  cartItemId String     @id @default(uuid())
+  stampId    String @unique
+  collection Collection @relation(fields: [stampId], references: [id],onDelete: Cascade,onUpdate: Cascade)
+  userId     String
+  user       Users      @relation(fields: [userId], references: [id],onDelete: Cascade,onUpdate: Cascade)
 }
 
 model Orders {
-  orderId    String     @id @default(uuid())
-  txnId      String
-  orderStatus String
-  cartItemId String
-  cartItem   Cart_items @relation(fields: [cartItemId], references: [cartItemId])
-  userId     String
-  user       Users      @relation(fields: [userId], references: [id])
+  orderId     String     @id @default(uuid())
+  txnId       String     @unique
+  orderStatus String     @default("pending")
+  orderTime   DateTime   @default(now())
+  stampId     String
+  collection  Collection @relation(fields: [stampId], references: [id],onDelete: Cascade,onUpdate: Cascade)
+  userId      String
+  user        Users      @relation(fields: [userId], references: [id],onDelete: Cascade,onUpdate: Cascade)
 }

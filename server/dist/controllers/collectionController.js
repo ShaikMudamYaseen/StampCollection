@@ -66,7 +66,14 @@ const getMyStamps = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 const getAllStamps = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const stampCollection = yield prisma.collection.findMany();
+        const stampCollection = yield prisma.collection.findMany({
+            where: {
+                NOT: {
+                    userId: req.body.userId
+                },
+                sell: true
+            }
+        });
         // console.log(stampCollection);
         res.json({
             status: "success",
@@ -112,7 +119,7 @@ const updateStamp = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 const deleteStamp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        if (req.params.userId) {
+        if (req.body.userId) {
             const deleted = yield prisma.collection.delete({
                 where: {
                     id: req.params.id
@@ -139,11 +146,69 @@ const deleteStamp = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         });
     }
 });
+const getStampById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (req.body.userId) {
+            const stamp = yield prisma.collection.findFirst({
+                where: {
+                    id: req.params.stampId
+                }
+            });
+            res.status(200).json({
+                status: "Success",
+                stamp: stamp
+            });
+        }
+        else {
+            res.status(401).json({
+                status: "failed",
+                message: "unauthorized"
+            });
+        }
+    }
+    catch (err) {
+        res.json({
+            status: "failed",
+            message: err.meta.cause
+        });
+    }
+});
+const sellStamp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (req.body.userId) {
+            const stamp = yield prisma.collection.update({
+                where: { id: req.body.stampId },
+                data: {
+                    sell: true
+                }
+            });
+            res.status(200).json({
+                status: "Success",
+                message: "sell status is active now",
+                stamp: stamp
+            });
+        }
+        else {
+            res.status(401).json({
+                status: "failed",
+                message: "unauthorized"
+            });
+        }
+    }
+    catch (err) {
+        res.json({
+            status: "failed",
+            message: err.meta.cause
+        });
+    }
+});
 exports.default = {
     createStamp,
     getMyStamps,
     getAllStamps,
     updateStamp,
-    deleteStamp
+    deleteStamp,
+    getStampById,
+    sellStamp
 };
 //# sourceMappingURL=collectionController.js.map
